@@ -9,9 +9,14 @@ Status convention: **CONFIRMED** / **PROPOSED** / **OPEN** / **REJECTED**. A sta
 | Phase 0B — Core Business Model | CONFIRMED | COMPLETE — BMD-001 through BMD-008 accepted and synchronized. |
 | Phase 0C — User Flows | CONFIRMED | COMPLETE — 12 core flows mapped and FMD-001 through FMD-010 accepted. |
 | Phase 0D — Permission Model | CONFIRMED | COMPLETE — 44 permission rules analyzed; PDM-001 through PDM-006 accepted. |
-| Phase 1 — Architecture | CONFIRMED | NEXT / READY — not started. |
+| Phase 1 — Architecture | CONFIRMED | IN PROGRESS — Phase 1A Architecture Principles & System Boundaries is FROZEN / COMPLETE; Phase 1B — Identity & Authentication is NEXT / READY and not started. |
+| Phase 1A — Architecture Principles & System Boundaries | CONFIRMED | FROZEN / COMPLETE — ARCH-1A-V1; AD-003 through AD-007 ACCEPTED as the authoritative Architecture Baseline. |
+| Phase 1B — Identity & Authentication | CONFIRMED | NEXT / READY — not started. |
 | Later phases | OPEN | Not Planned Yet. |
-| Architecture | CONFIRMED | Not started. |
+| Architecture | CONFIRMED | Phase 1A Architecture Principles & System Boundaries is FROZEN / COMPLETE as ARCH-1A-V1, using read-only `PD-V1` input: tag `product-definition-v1`, commit `59738725dec33272e4a9fd8fa0f14ddb0cf1c5f1`. Phase 1 Architecture remains IN PROGRESS; Phase 1B is NEXT / READY and not started. |
+| Phase 1A Architecture Audit | CONFIRMED | PASS — Blocker = 0; Major = 0; Minor = 0; Change Request = 0; unresolved 1A-specific OPEN = 0. Architecture Principles Baseline Freeze readiness was READY and approval is recorded in DEC-040. | `docs/audit/PHASE-1A-ARCHITECTURE-AUDIT.md`; DEC-038; DEC-040 |
+| Phase 1A Architecture Freeze | CONFIRMED | COMPLETE — ARCH-1A-V1 approved by Project Owner / Architecture Approval Authority. AD-003 through AD-007 are ACCEPTED Architecture Baseline decisions; Product Change Request = 0; Architecture exceptions = 0. | DEC-040; `PHASE-1A-FREEZE-RECORD.md` |
+| Architecture baseline input | CONFIRMED | `PD-V1` is authoritative for Phase 1A; any needed Phase 0 product-definition change must use Change Request → Impact Review → Decision → Approved Update. |
 | Task | CONFIRMED | Not started. |
 | Coding | CONFIRMED | Not started. |
 | Source ingestion | CONFIRMED | SRC-001 and SRC-002 ingested and registered. |
@@ -26,7 +31,8 @@ Status convention: **CONFIRMED** / **PROPOSED** / **OPEN** / **REJECTED**. A sta
 | Cross-document consistency remediation | CONFIRMED | M-01 through M-03 are closed in Round 2; M-06 and N-01/N-03/N-04 are closed in Round 3. M-04/M-05 remain local contract-matrix gates only. |
 | Product Definition Re-Audit | CONFIRMED | PASS — Blocker = 0; Freeze-blocking Major = 0; RA-01 and RA-02 closed; remaining M-04/M-05 are local gates. |
 | Product Definition Freeze Record | CONFIRMED | `docs/00-project/PD-V1-FREEZE-RECORD.md`; DEC-037. |
-| Architecture work | REJECTED | Not entered in this update; source technology content remains `PROPOSED`. |
+| Architecture work | CONFIRMED | Phase 1A is FROZEN / COMPLETE. Its accepted Architecture Baseline governs downstream Architecture work; Phase 1B Identity & Authentication is NEXT / READY but not started. Source technology content remains `PROPOSED`. |
+| ERD / API Contract / Task / Coding work | REJECTED | Not entered in Phase 1A. |
 | Task generation | REJECTED | Not entered in this update. |
 | Coding work | REJECTED | Not entered in this update. |
 | Provenance enrichment and release criteria | OPEN | SRC-001 historical metadata is deferred/non-blocking; Release / UAT / Go-Live criteria remain deferred to R1 — Release Planning / Pre-Go-Live. |
@@ -35,4 +41,4 @@ Status convention: **CONFIRMED** / **PROPOSED** / **OPEN** / **REJECTED**. A sta
 
 | Status | Statement |
 | --- | --- |
-| OPEN | Obtain explicit authorization before beginning Phase 1 Architecture. |
+| OPEN | Obtain separately authorized Phase 1B scope approval before beginning Phase 1B Identity & Authentication. The remaining 1C–1J sequence is Not Planned Yet. |

@@ -75,6 +75,14 @@ Status convention: **CONFIRMED** / **PROPOSED** / **OPEN** / **REJECTED**. A sta
 
 No question is treated as answered unless an authoritative source or explicit decision resolves it.
 
+## Phase 1A architecture posture
+
+| Status | Statement | Traceability |
+| --- | --- | --- |
+| CONFIRMED | Phase 1A does not resolve, reclassify, or pull forward any remaining OPEN product question. Each continues to block only at its registered Decision Gate. | DEC-026; DEC-038 |
+| CONFIRMED | PD-V1 is a read-only architecture input. Any architecture finding that requires a Phase 0 product-definition change must use Change Request → Impact Review → Decision → Approved Update. | DEC-025; DEC-037; DEC-038 |
+| OPEN | Architecture Review must accept, revise, or reject Phase 1A recommendations before an explicitly named Phase 1B scope can be authorized. | DEC-039 |
+
 ## OPEN decision-gate register
 
 **CONFIRMED** — Every item currently marked `OPEN` above is governed by this register. A Blocking Level does not answer the question; it determines the latest gate at which an explicit decision or approved deferral must be evidenced. `DEFERRED / NON-BLOCKING` items remain OPEN until their stated closure evidence exists.
