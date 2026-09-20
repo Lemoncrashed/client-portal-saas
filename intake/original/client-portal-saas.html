@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>轻量化多租户白标客户门户 SaaS · 项目建设及报价方案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Outfit:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f6fb;
+    --surface: #ffffff;
+    --ink: #0f1222;
+    --ink-2: #3d4460;
+    --muted: #6b728e;
+    --line: #e4e6f0;
+    --line-soft: #eef0f6;
+    --accent: #4f46e5;
+    --accent-2: #4338ca;
+    --accent-soft: #eef2ff;
+    --accent-mid: #c7d2fe;
+    --warn: #f59e0b;
+    --warn-soft: #fffbeb;
+    --danger: #ef4444;
+    --danger-soft: #fef2f2;
+    --ok: #10b981;
+    --ok-soft: #ecfdf5;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(15, 18, 34, 0.04), 0 12px 32px rgba(15, 18, 34, 0.05);
+    --nav-w: 248px;
+    --max: 880px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink-2);
+    background: var(--bg);
+    font-family: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent-2); text-underline-offset: 3px; }
+  a:hover { color: var(--accent); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: var(--nav-w) minmax(0, 1fr);
+    min-height: 100vh;
+  }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid var(--line);
+    padding: 24px 14px 40px;
+  }
+  .nav::-webkit-scrollbar { width: 4px; }
+  .nav::-webkit-scrollbar-thumb { background: #c7c9d9; border-radius: 99px; }
+
+  .nav-brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 10px 18px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .nav-brand .mark {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #818cf8 0%, #4f46e5 48%, #312e81 100%);
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.28);
+  }
+  .nav-brand .mark::before,
+  .nav-brand .mark::after {
+    content: "";
+    position: absolute;
+    border: 1.5px solid rgba(255,255,255,0.92);
+    border-radius: 3px;
+  }
+  .nav-brand .mark::before {
+    left: 8px; top: 10px;
+    width: 12px; height: 10px;
+  }
+  .nav-brand .mark::after {
+    right: 8px; bottom: 9px;
+    width: 12px; height: 10px;
+    opacity: 0.75;
+  }
+  .nav-brand strong {
+    display: block;
+    font-family: Outfit, "Noto Sans SC", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .nav-brand span {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .nav-label {
+    margin: 18px 10px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: Outfit, sans-serif;
+  }
+  .nav a {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    text-decoration: none;
+    color: var(--ink-2);
+    padding: 7px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    transition: background .15s, color .15s;
+  }
+  .nav a .i {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 1.8em;
+  }
+  .nav a:hover,
+  .nav a.active {
+    background: var(--accent-soft);
+    color: var(--accent-2);
+  }
+  .nav a.active { font-weight: 600; }
+  .nav a.active .i { color: var(--accent); }
+
+  .main { min-width: 0; }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 56px 48px 48px;
+    background:
+      radial-gradient(ellipse 70% 80% at 100% 0%, rgba(79, 70, 229, 0.14), transparent 55%),
+      radial-gradient(ellipse 50% 60% at 0% 100%, rgba(129, 140, 248, 0.12), transparent 50%),
+      linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-inner { position: relative; max-width: var(--max); }
+  .badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: Outfit, "Noto Sans SC", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-2);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-mid);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+  .badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  }
+  .badge.muted {
+    color: var(--muted);
+    background: #f1f3f8;
+    border-color: var(--line);
+  }
+  .badge.muted::before { background: var(--muted); box-shadow: none; }
+
+  .hero h1 {
+    margin: 0 0 12px;
+    font-family: Outfit, "Noto Sans SC", sans-serif;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    line-height: 1.22;
+  }
+  .hero .sub {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .hero .lead {
+    margin: 16px 0 0;
+    max-width: 42em;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 32px;
+    max-width: var(--max);
+  }
+  .hero-stat {
+    padding: 16px 18px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .hero-stat .v {
+    font-family: Outfit, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .hero-stat .k {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .content {
+    max-width: calc(var(--max) + 96px);
+    margin: 0 auto;
+    padding: 36px 48px 72px;
+  }
+
+  section.doc {
+    margin-bottom: 44px;
+    scroll-margin-top: 20px;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .sec-head .idx {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-2);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-mid);
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .sec-head h2 {
+    margin: 0;
+    font-family: Outfit, "Noto Sans SC", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    margin: 26px 0 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  h4 {
+    margin: 20px 0 8px;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.2em; }
+  li { margin: 3px 0; }
+  li::marker { color: var(--accent); }
+  strong { color: var(--ink); font-weight: 650; }
+  code {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12.5px;
+    background: var(--accent-soft);
+    color: var(--accent-2);
+    padding: 1px 6px;
+    border-radius: 6px;
+  }
+
+  .quote {
+    margin: 14px 0;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    color: var(--ink);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  .quote.warn {
+    border-left-color: var(--warn);
+    background: var(--warn-soft);
+  }
+  .quote.ok {
+    border-left-color: var(--ok);
+    background: var(--ok-soft);
+  }
+  .quote.danger {
+    border-left-color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .panel {
+    margin: 14px 0;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .panel .lbl {
+    font-family: Outfit, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    margin-bottom: 8px;
+  }
+
+  .flow {
+    margin: 12px 0 16px;
+    padding: 16px 18px;
+    background: #0f1222;
+    color: #e2e8f0;
+    border-radius: 14px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    overflow-x: auto;
+    white-space: pre;
+    box-shadow: var(--shadow);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .card {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+  .card p { margin: 0; font-size: 13px; color: var(--muted); }
+  .card ul { margin-bottom: 0; font-size: 13.5px; }
+  .card .role {
+    display: inline-block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--accent-2);
+    background: var(--accent-soft);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .chip {
+    font-size: 12.5px;
+    padding: 5px 11px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-2);
+  }
+  .chip.tech {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11.5px;
+    background: #0f1222;
+    border-color: #0f1222;
+    color: #a5b4fc;
+  }
+  .chip.out {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+  }
+  .chip.ok {
+    background: var(--ok-soft);
+    border-color: #a7f3d0;
+    color: #047857;
+  }
+  .chip.warn {
+    background: var(--warn-soft);
+    border-color: #fde68a;
+    color: #b45309;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .status.wait i { background: var(--muted); }
+  .status.pending i { background: var(--warn); }
+  .status.active i { background: var(--ok); }
+  .status.fail i { background: var(--danger); }
+
+  .steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 12px 0 16px;
+  }
+  .steps .n {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+  .steps .n em {
+    font-style: normal;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    color: var(--accent-2);
+    background: var(--accent-soft);
+    padding: 1px 6px;
+    border-radius: 6px;
+  }
+  .steps .arr {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .arch {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0 18px;
+  }
+  .arch-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .arch-node {
+    text-align: center;
+    padding: 14px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .arch-node.full { grid-column: 1 / -1; }
+  .arch-node .t {
+    font-family: Outfit, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .arch-node .d {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .arch-node.platform {
+    background: linear-gradient(180deg, #eef2ff, #ffffff);
+    border-color: var(--accent-mid);
+  }
+
+  .tenant-tree {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .tenant {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .tenant .name {
+    font-family: Outfit, sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .tenant ul {
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 13px;
+  }
+  .tenant .dom {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--accent-2);
+    margin-bottom: 8px;
+  }
+
+  .page-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .page-cols ul {
+    margin: 0;
+    font-size: 13.5px;
+  }
+
+  .metric {
+    text-align: center;
+    padding: 18px 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .metric .v {
+    font-family: Outfit, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .metric .v em {
+    font-style: normal;
+    color: var(--accent-2);
+  }
+  .metric .k {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .diff-item {
+    margin-bottom: 12px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .diff-item .tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--accent-2);
+    font-weight: 500;
+  }
+  .diff-item h4 { margin: 4px 0 8px; }
+  .diff-item p { margin: 0; font-size: 14px; }
+
+  .stack {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: Outfit, "Noto Sans SC", sans-serif;
+  }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+    .nav {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+    }
+    .nav nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .hero, .content { padding-left: 20px; padding-right: 20px; }
+    .hero { padding-top: 36px; padding-bottom: 32px; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+    .grid-2, .grid-3, .grid-4, .tenant-tree, .page-cols, .stack, .arch-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .nav { display: none; }
+    .layout { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="nav">
+    <div class="nav-brand">
+      <div class="mark" aria-hidden="true"></div>
+      <div>
+        <strong>Client Portal SaaS</strong>
+        <span>White-label / V1</span>
+      </div>
+    </div>
+    <div class="nav-label">Contents</div>
+    <nav id="toc">
+      <a href="#s1"><span class="i">01</span>项目背景</a>
+      <a href="#s2"><span class="i">02</span>建设目标</a>
+      <a href="#s3"><span class="i">03</span>系统角色</a>
+      <a href="#s4"><span class="i">04</span>整体架构</a>
+      <a href="#s5"><span class="i">05</span>核心功能</a>
+      <a href="#s6"><span class="i">06</span>订阅系统</a>
+      <a href="#s7"><span class="i">07</span>自托管能力</a>
+      <a href="#s8"><span class="i">08</span>无远程 License</a>
+      <a href="#s9"><span class="i">09</span>技术方案</a>
+      <a href="#s10"><span class="i">10</span>AWS 部署</a>
+      <a href="#s11"><span class="i">11</span>技术难点</a>
+      <a href="#s12"><span class="i">12</span>安全设计</a>
+      <a href="#s13"><span class="i">13</span>Audit Log</a>
+      <a href="#s14"><span class="i">14</span>V1 页面范围</a>
+      <a href="#s15"><span class="i">15</span>不包含范围</a>
+      <a href="#s16"><span class="i">16</span>第三方费用</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="badge-row">
+          <span class="badge">Multi-tenant</span>
+          <span class="badge muted">White Label</span>
+          <span class="badge muted">Self-hosted</span>
+          <span class="badge muted">Lemon Squeezy</span>
+        </div>
+        <h1>轻量化多租户白标客户门户 SaaS</h1>
+        <p class="sub">项目建设及报价方案</p>
+        <p class="lead">面向咨询、设计、软件开发、代理服务等 B2B 企业，建设一套多租户、完全白标、可自托管的 Client Portal 平台。重点覆盖客户门户、品牌白标、独立域名、文件共享、工单、报价单与 PI，以及订阅自动开通。</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="v">4 类角色</div><div class="k">Platform / Tenant / Staff / Client</div></div>
+        <div class="hero-stat"><div class="v">完全白标</div><div class="k">下游客户看不到开发商品牌</div></div>
+        <div class="hero-stat"><div class="v">独立域名</div><div class="k">Custom Domain + 自动 SSL</div></div>
+        <div class="hero-stat"><div class="v">AWS 自托管</div><div class="k">无远程 License / Call Home</div></div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section class="doc" id="s1">
+        <div class="sec-head"><span class="idx">01</span><h2>项目背景</h2></div>
+        <p>本项目计划建设一套面向企业客户使用的：</p>
+        <div class="quote">多租户、完全白标、自托管 Client Portal SaaS 平台。</div>
+        <p>平台主要服务于咨询、设计、软件开发、代理服务、专业服务等 B2B 企业，为每一家租户提供独立的客户门户。</p>
+        <p>系统重点不是建设完整 CRM、ERP 或营销自动化平台，而是围绕以下核心场景：</p>
+        <div class="chips">
+          <span class="chip">企业客户门户</span>
+          <span class="chip">企业品牌白标</span>
+          <span class="chip">独立访问域名</span>
+          <span class="chip">客户及员工账号</span>
+          <span class="chip">文件共享</span>
+          <span class="chip">客户服务工单</span>
+          <span class="chip">报价单及 PI</span>
+          <span class="chip">SaaS 订阅自动开通</span>
+        </div>
+        <p>整体产品方向参考 ClientPortal 类产品，但根据本项目实际需求进行轻量化建设，控制系统复杂度和初期投入。</p>
+      </section>
+
+      <section class="doc" id="s2">
+        <div class="sec-head"><span class="idx">02</span><h2>项目建设目标</h2></div>
+        <p>本项目完成后，平台运营方可以通过一套系统同时服务多个企业租户。每个企业租户拥有：</p>
+        <div class="chips">
+          <span class="chip">自己的 Logo</span>
+          <span class="chip">自己的品牌颜色</span>
+          <span class="chip">自己的企业信息</span>
+          <span class="chip">自己的员工账号</span>
+          <span class="chip">自己的客户账号</span>
+          <span class="chip">自己的文件</span>
+          <span class="chip">自己的工单</span>
+          <span class="chip">自己的报价单</span>
+          <span class="chip">自己的 PI</span>
+          <span class="chip">自己的独立域名</span>
+        </div>
+
+        <h3>多租户示意</h3>
+        <div class="tenant-tree">
+          <div class="tenant">
+            <div class="name">Tenant A</div>
+            <div class="dom">portal.company-a.com</div>
+            <ul>
+              <li>Company A Logo</li>
+              <li>Company A Theme</li>
+              <li>Staff</li>
+              <li>Clients</li>
+            </ul>
+          </div>
+          <div class="tenant">
+            <div class="name">Tenant B</div>
+            <div class="dom">clients.company-b.com</div>
+            <ul>
+              <li>Company B Logo</li>
+              <li>Company B Theme</li>
+              <li>Staff</li>
+              <li>Clients</li>
+            </ul>
+          </div>
+          <div class="tenant">
+            <div class="name">Tenant C</div>
+            <div class="dom">独立门户</div>
+            <ul>
+              <li>独立品牌</li>
+              <li>独立数据</li>
+              <li>Staff</li>
+              <li>Clients</li>
+            </ul>
+          </div>
+        </div>
+        <p>Tenant A 与 Tenant B 虽然运行在同一套 SaaS 平台中，但：</p>
+        <div class="grid-2">
+          <div class="card">
+            <h4>数据隔离</h4>
+            <ul>
+              <li>数据互不可见</li>
+              <li>用户互不可见</li>
+              <li>文件互不可见</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>品牌隔离</h4>
+            <ul>
+              <li>域名不同</li>
+              <li>品牌不同</li>
+              <li>下游客户看不到平台开发方品牌信息</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc" id="s3">
+        <div class="sec-head"><span class="idx">03</span><h2>系统角色</h2></div>
+        <p>本项目设计四类核心角色。</p>
+        <div class="grid-2">
+          <div class="card">
+            <span class="role">Platform Admin</span>
+            <h4>3.1 平台管理员</h4>
+            <p style="margin-bottom:8px">负责整个 SaaS 平台运营。</p>
+            <ul>
+              <li>Tenant 管理 / 开通 / 停用</li>
+              <li>查看订阅状态、域名状态</li>
+              <li>查看 SaaS 使用情况</li>
+              <li>查看 Webhook、系统日志</li>
+              <li>系统配置</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="role">Tenant Admin</span>
+            <h4>3.2 租户管理员</h4>
+            <p style="margin-bottom:8px">每家企业客户的最高管理员。</p>
+            <ul>
+              <li>企业资料、Logo、品牌颜色</li>
+              <li>自定义域名设置</li>
+              <li>员工管理、客户管理</li>
+              <li>文件、工单、Quote、PI 管理</li>
+              <li>Billing 状态查看</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="role">Staff</span>
+            <h4>3.3 内部员工</h4>
+            <p style="margin-bottom:8px">租户内部工作人员。</p>
+            <ul>
+              <li>查看客户、管理文件</li>
+              <li>处理工单</li>
+              <li>创建 Quote / PI</li>
+              <li>服务下游客户</li>
+            </ul>
+            <p style="margin-top:8px">V1 采用标准员工角色，不做复杂自定义权限编辑器。</p>
+          </div>
+          <div class="card">
+            <span class="role">Client</span>
+            <h4>3.4 下游客户</h4>
+            <p style="margin-bottom:8px">企业租户所服务的最终客户。登录后只能查看自己的：</p>
+            <ul>
+              <li>文件、工单</li>
+              <li>Quote、PI</li>
+              <li>个人资料</li>
+            </ul>
+            <p style="margin-top:8px">不能查看其他客户或企业内部数据。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc" id="s4">
+        <div class="sec-head"><span class="idx">04</span><h2>系统整体架构</h2></div>
+        <div class="arch">
+          <div class="arch-node platform full">
+            <div class="t">SaaS Platform</div>
+            <div class="d">Platform Admin</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-node">
+              <div class="t">Tenant A</div>
+              <div class="d">portal.company-a.com</div>
+              <p style="margin:10px 0 0;font-size:13px">Tenant Admin · Staff · Clients</p>
+              <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">Files · Tickets · Quote / PI</p>
+            </div>
+            <div class="arch-node">
+              <div class="t">Tenant B</div>
+              <div class="d">clients.company-b.com</div>
+              <p style="margin:10px 0 0;font-size:13px">Tenant Admin · Staff · Clients</p>
+              <p style="margin:4px 0 0;font-size:12px;color:var(--muted)">Files · Tickets · Quote / PI</p>
+            </div>
+          </div>
+        </div>
+        <div class="flow">                       SaaS Platform
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   Platform Admin    │
+                 └─────────┬───────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 │                   │
+              Tenant A            Tenant B
+                 │                   │
+        portal.company-a.com  clients.company-b.com
+                 │                   │
+        ┌────────┴───────┐   ┌──────┴─────────┐
+        │                │   │                │
+   Tenant Admin        Staff Tenant Admin    Staff
+        │                              │
+      Clients                        Clients
+        │                              │
+ ┌──────┼────────┐              ┌──────┼────────┐
+ │      │        │              │      │        │
+Files Tickets Quote/PI         Files Tickets Quote/PI</div>
+      </section>
+
+      <section class="doc" id="s5">
+        <div class="sec-head"><span class="idx">05</span><h2>核心功能清单</h2></div>
+
+        <h3>5.1 SaaS 平台管理</h3>
+        <p>平台管理后台主要包含：</p>
+        <div class="grid-2">
+          <div class="card">
+            <h4>Dashboard</h4>
+            <ul>
+              <li>Tenant 总数量</li>
+              <li>Active Tenant / Suspended Tenant</li>
+              <li>Active Subscription</li>
+              <li>Domain 状态</li>
+              <li>系统运行状态</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Tenant 管理</h4>
+            <ul>
+              <li>Tenant 列表 / 详情 / 创建</li>
+              <li>Tenant 状态修改</li>
+              <li>Tenant 停用 / 恢复</li>
+              <li>Tenant 基本使用情况查看</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Subscription 管理</h4>
+            <ul>
+              <li>Subscription 状态</li>
+              <li>套餐、到期时间</li>
+              <li>Lemon Squeezy Subscription ID</li>
+              <li>Tenant 状态</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Domain 管理</h4>
+            <ul>
+              <li>Tenant</li>
+              <li>自定义域名</li>
+              <li>DNS 状态 / SSL 状态</li>
+              <li>域名启用状态</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>5.2 多租户系统</h3>
+        <p>系统必须支持多个 Tenant 共存。每一个 Tenant 数据完全独立，包括：</p>
+        <div class="chips">
+          <span class="chip">用户数据</span>
+          <span class="chip">客户数据</span>
+          <span class="chip">文件</span>
+          <span class="chip">工单</span>
+          <span class="chip">Quote</span>
+          <span class="chip">PI</span>
+          <span class="chip">企业配置</span>
+          <span class="chip">域名</span>
+          <span class="chip">品牌信息</span>
+        </div>
+        <div class="quote warn">Tenant A ≠ Tenant B。任何 Tenant 用户都不能通过修改 URL、接口参数或其他方式访问其他 Tenant 数据。</div>
+
+        <h3>5.3 企业白标 Branding</h3>
+        <p>Tenant Admin 可以自行设置品牌。</p>
+        <div class="grid-2">
+          <div class="card">
+            <h4>企业资料</h4>
+            <ul>
+              <li>Company Name</li>
+              <li>Company Address</li>
+              <li>Website</li>
+              <li>Support Email</li>
+              <li>Phone</li>
+              <li>PDF Footer</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>品牌资产</h4>
+            <p style="margin-bottom:8px">支持上传 Logo、Favicon；支持设置 Primary Color、Accent Color、Background Theme。</p>
+            <p>自动应用于 Login、Dashboard、Button、Navigation、Quote、PI、PDF。</p>
+          </div>
+        </div>
+
+        <h3>5.4 完整 White Label</h3>
+        <div class="quote">下游客户访问 Tenant Portal 时，<strong>不出现平台开发商品牌。</strong></div>
+        <div class="chips">
+          <span class="chip out">不出现开发商 Logo</span>
+          <span class="chip out">不出现 Powered by</span>
+          <span class="chip out">不出现开发商网站</span>
+          <span class="chip out">不出现开发商公司名称</span>
+        </div>
+        <p>Tenant 的 Logo、Company Name、Colors、Domain 将作为客户看到的品牌。</p>
+
+        <h3>5.5 自定义独立域名</h3>
+        <p>Tenant 默认可以拥有平台子域名，例如 <code>company-a.portal.example.com</code>，同时支持绑定自己的域名 <code>portal.company-a.com</code>。</p>
+        <p>Tenant Admin 输入自定义域名后，系统生成 DNS 配置提示：</p>
+        <div class="panel">
+          <div class="lbl">DNS 配置提示</div>
+          <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8">
+            Type: <strong>CNAME</strong><br />
+            Name: <strong>portal</strong><br />
+            Target: <strong>xxxxx.platform-domain.com</strong>
+          </p>
+        </div>
+        <p>用户完成 DNS 配置以后，平台自动验证。</p>
+
+        <h3>5.6 SSL 自动配置</h3>
+        <p>Custom Domain 验证通过以后，系统自动处理 HTTPS / SSL。Tenant 不需要手动上传 SSL 证书。</p>
+        <div class="chips">
+          <span class="status wait"><i></i>Waiting DNS</span>
+          <span class="status pending"><i></i>Verifying</span>
+          <span class="status pending"><i></i>SSL Pending</span>
+          <span class="status active"><i></i>Active</span>
+          <span class="status fail"><i></i>Failed</span>
+        </div>
+        <p>成功以后可直接访问 <code>https://portal.company-a.com</code>。</p>
+
+        <h3>5.7 员工管理</h3>
+        <p>Tenant Admin 可以创建、邀请、禁用 Staff，并查看 Staff 状态。Staff 使用自己的账号登录系统。</p>
+
+        <h3>5.8 客户管理</h3>
+        <p>Tenant Admin / Staff 可以新增、编辑、邀请、禁用 Client，并查看 Client 详情。</p>
+        <div class="chips">
+          <span class="chip">Name</span>
+          <span class="chip">Company</span>
+          <span class="chip">Email</span>
+          <span class="chip">Phone</span>
+          <span class="chip">Status</span>
+          <span class="chip">Notes</span>
+        </div>
+
+        <h3>5.9 文件管理</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h4>Tenant Admin / Staff</h4>
+            <ul>
+              <li>创建文件夹</li>
+              <li>上传 / 下载 / 删除 / 重命名</li>
+              <li>将文件关联给 Client</li>
+              <li>搜索文件</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Client</h4>
+            <ul>
+              <li>查看自己的文件</li>
+              <li>下载自己的文件</li>
+              <li>上传允许上传的文件</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>5.10 文件安全</h3>
+        <p>文件不能直接公开访问。只有具备权限的用户才能下载：</p>
+        <div class="steps">
+          <span class="n"><em>1</em>Authorization</span>
+          <span class="arr">→</span>
+          <span class="n"><em>2</em>Temporary Secure URL</span>
+          <span class="arr">→</span>
+          <span class="n"><em>3</em>Download</span>
+        </div>
+        <p>防止通过文件 URL 访问其他 Tenant 或 Client 文件。</p>
+
+        <h3>5.11 简易工单</h3>
+        <div class="grid-2">
+          <div class="card">
+            <h4>Client</h4>
+            <ul>
+              <li>创建工单</li>
+              <li>查看工单</li>
+              <li>回复</li>
+              <li>上传附件</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Staff</h4>
+            <ul>
+              <li>查看工单、回复</li>
+              <li>分配负责人</li>
+              <li>修改状态 / 优先级</li>
+              <li>关闭工单</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>5.12 工单状态</h3>
+        <h4>Status</h4>
+        <div class="chips">
+          <span class="chip">Open</span>
+          <span class="chip warn">In Progress</span>
+          <span class="chip warn">Waiting for Client</span>
+          <span class="chip ok">Resolved</span>
+          <span class="chip">Closed</span>
+        </div>
+        <h4>Priority</h4>
+        <div class="chips">
+          <span class="chip">Low</span>
+          <span class="chip">Normal</span>
+          <span class="chip warn">High</span>
+          <span class="chip out">Urgent</span>
+        </div>
+
+        <h3>5.13 Quote 报价单</h3>
+        <p>Tenant Admin / Staff 可以创建 Quote，包含：</p>
+        <div class="chips">
+          <span class="chip">Quote Number</span>
+          <span class="chip">Customer</span>
+          <span class="chip">Date</span>
+          <span class="chip">Expiry Date</span>
+          <span class="chip">Product / Service</span>
+          <span class="chip">Description</span>
+          <span class="chip">Quantity</span>
+          <span class="chip">Unit Price</span>
+          <span class="chip">Tax</span>
+          <span class="chip">Discount</span>
+          <span class="chip">Total</span>
+          <span class="chip">Terms</span>
+          <span class="chip">Notes</span>
+        </div>
+
+        <h3>5.14 PI Proforma Invoice</h3>
+        <p>支持创建 <strong>Proforma Invoice</strong>，信息包括：</p>
+        <div class="chips">
+          <span class="chip">PI Number</span>
+          <span class="chip">Customer</span>
+          <span class="chip">Date</span>
+          <span class="chip">Expiry Date</span>
+          <span class="chip">Items</span>
+          <span class="chip">Quantity</span>
+          <span class="chip">Price</span>
+          <span class="chip">Subtotal</span>
+          <span class="chip">Tax</span>
+          <span class="chip">Discount</span>
+          <span class="chip">Total</span>
+          <span class="chip">Payment Terms</span>
+          <span class="chip">Notes</span>
+        </div>
+
+        <h3>5.15 PDF 导出</h3>
+        <p>Quote / PI 支持 <strong>Download PDF</strong>。PDF 自动使用 Tenant Logo、Company Name、Address、Brand Color 和 Contact Information。因此不同 Tenant 导出的文件拥有不同企业品牌。</p>
+      </section>
+
+      <section class="doc" id="s6">
+        <div class="sec-head"><span class="idx">06</span><h2>订阅系统</h2></div>
+        <p>平台订阅通过 <strong>Lemon Squeezy</strong> 完成。</p>
+
+        <h3>6.1 Subscription 开通流程</h3>
+        <div class="steps">
+          <span class="n"><em>1</em>Tenant Customer</span>
+          <span class="arr">→</span>
+          <span class="n"><em>2</em>Checkout</span>
+          <span class="arr">→</span>
+          <span class="n"><em>3</em>Payment</span>
+          <span class="arr">→</span>
+          <span class="n"><em>4</em>Webhook</span>
+          <span class="arr">→</span>
+          <span class="n"><em>5</em>Create Tenant</span>
+          <span class="arr">→</span>
+          <span class="n"><em>6</em>Create Admin</span>
+          <span class="arr">→</span>
+          <span class="n"><em>7</em>Activate</span>
+        </div>
+        <div class="flow">Tenant Customer
+      ↓
+Lemon Squeezy Checkout
+      ↓
+Payment Successful
+      ↓
+Webhook
+      ↓
+Create Tenant
+      ↓
+Create Admin
+      ↓
+Activate Subscription
+      ↓
+Tenant Available</div>
+
+        <h3>6.2 支持订阅生命周期</h3>
+        <div class="chips">
+          <span class="chip">Subscription Created</span>
+          <span class="chip">Subscription Updated</span>
+          <span class="chip ok">Payment Successful</span>
+          <span class="chip out">Payment Failed</span>
+          <span class="chip">Subscription Cancelled</span>
+          <span class="chip">Subscription Resumed</span>
+          <span class="chip warn">Subscription Expired</span>
+        </div>
+
+        <h3>6.3 自动停用</h3>
+        <p>当 Tenant Subscription 真正过期：</p>
+        <div class="steps">
+          <span class="n status active"><i></i>ACTIVE</span>
+          <span class="arr">→</span>
+          <span class="n status pending"><i></i>EXPIRED</span>
+          <span class="arr">→</span>
+          <span class="n status fail"><i></i>SUSPENDED</span>
+        </div>
+        <p>Tenant 数据不会立即删除。Tenant Admin 可以恢复订阅以后继续使用。</p>
+
+        <h3>6.4 取消订阅</h3>
+        <p>取消订阅以后，不立即停止服务。例如：</p>
+        <div class="panel">
+          <div class="lbl">Billing 生命周期示例</div>
+          <p style="margin:0">用户已经支付到 10 月 1 日。9 月 15 日取消后，9 月 15 日～10 月 1 日仍然正常使用；10 月 1 日以后 Tenant Suspended。</p>
+        </div>
+        <p>这样符合标准 SaaS Billing 生命周期。</p>
+      </section>
+
+      <section class="doc" id="s7">
+        <div class="sec-head"><span class="idx">07</span><h2>自托管能力</h2></div>
+        <p>本项目支持部署至客户自己的 <strong>AWS Account</strong>。客户最终拥有：</p>
+        <div class="chips">
+          <span class="chip tech">AWS</span>
+          <span class="chip tech">Domain</span>
+          <span class="chip tech">Server</span>
+          <span class="chip tech">Database</span>
+          <span class="chip tech">Storage</span>
+          <span class="chip tech">Source Code</span>
+          <span class="chip tech">Lemon Squeezy</span>
+          <span class="chip tech">Email Service</span>
+        </div>
+        <div class="quote ok">项目完成以后不存在开发商服务器强依赖。</div>
+      </section>
+
+      <section class="doc" id="s8">
+        <div class="sec-head"><span class="idx">08</span><h2>无远程 License 激活</h2></div>
+        <p>系统不会设计 Remote License Server，也不会存在必须访问 <code>developer-server.com/license/check</code> 才能运行的机制。</p>
+        <div class="chips">
+          <span class="chip out">无远程 License</span>
+          <span class="chip out">无 Call Home</span>
+          <span class="chip out">无远程激活</span>
+          <span class="chip out">无开发商后台控制程序运行</span>
+        </div>
+      </section>
+
+      <section class="doc" id="s9">
+        <div class="sec-head"><span class="idx">09</span><h2>推荐技术方案</h2></div>
+        <div class="stack">
+          <div class="card">
+            <h4>前端</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">Next.js</span>
+              <span class="chip tech">React</span>
+              <span class="chip tech">TypeScript</span>
+              <span class="chip tech">Tailwind CSS</span>
+              <span class="chip tech">shadcn/ui</span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>后端</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">NestJS</span>
+              <span class="chip tech">TypeScript</span>
+              <span class="chip tech">REST API</span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>数据库</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">PostgreSQL</span>
+            </div>
+            <p style="margin-top:10px">Tenant ID + Application Isolation + PostgreSQL Row Level Security</p>
+          </div>
+          <div class="card">
+            <h4>缓存 / Queue</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">Redis</span>
+            </div>
+            <p style="margin-top:10px">Cache · Queue · Background Jobs</p>
+          </div>
+          <div class="card">
+            <h4>文件</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">AWS S3</span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>PDF</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">HTML</span>
+              <span class="chip tech">Playwright</span>
+              <span class="chip tech">Chromium</span>
+            </div>
+            <p style="margin-top:10px">动态生成 PDF</p>
+          </div>
+          <div class="card">
+            <h4>SaaS Billing</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">Lemon Squeezy</span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Deployment</h4>
+            <div class="chips" style="margin:0">
+              <span class="chip tech">Docker</span>
+              <span class="chip tech">AWS</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc" id="s10">
+        <div class="sec-head"><span class="idx">10</span><h2>AWS 部署架构</h2></div>
+        <div class="arch">
+          <div class="arch-node platform full">
+            <div class="t">Internet</div>
+            <div class="d">CloudFront → Custom Domain / SSL</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-node">
+              <div class="t">Web</div>
+              <div class="d">Application Layer</div>
+            </div>
+            <div class="arch-node">
+              <div class="t">API</div>
+              <div class="d">Application Layer</div>
+            </div>
+          </div>
+          <div class="grid-3" style="margin:0">
+            <div class="arch-node">
+              <div class="t">PostgreSQL</div>
+              <div class="d">RDS</div>
+            </div>
+            <div class="arch-node">
+              <div class="t">Redis</div>
+              <div class="d">Cache / Queue</div>
+            </div>
+            <div class="arch-node">
+              <div class="t">S3</div>
+              <div class="d">Files</div>
+            </div>
+          </div>
+        </div>
+        <div class="flow">                        Internet
+                           │
+                           ▼
+                     CloudFront
+                           │
+                           ▼
+                 Custom Domain / SSL
+                           │
+                           ▼
+                   Application Layer
+                           │
+               ┌───────────┴───────────┐
+               │                       │
+             Web                       API
+               │                       │
+               └───────────┬───────────┘
+                           │
+            ┌──────────────┼─────────────┐
+            │              │             │
+            ▼              ▼             ▼
+      PostgreSQL         Redis           S3
+        RDS                              Files</div>
+      </section>
+
+      <section class="doc" id="s11">
+        <div class="sec-head"><span class="idx">11</span><h2>主要技术难点</h2></div>
+
+        <div class="diff-item">
+          <div class="tag">11.1</div>
+          <h4>多租户强隔离</h4>
+          <p>最大风险：Tenant A 通过修改请求参数访问 Tenant B 数据。解决方式为多层保护：Tenant Resolver + Backend Tenant Scope + Database Row Level Security + Cross Tenant Security Test。</p>
+        </div>
+        <div class="diff-item">
+          <div class="tag">11.2</div>
+          <h4>Custom Domain</h4>
+          <p>系统未来可能存在几十、几百甚至更多 Tenant，每个 Tenant 都可能使用自己的域名。传统 Nginx + Certbot 人工维护模式不适合 SaaS。解决：使用 AWS CloudFront 多租户域名能力统一处理 Tenant Domain、DNS、TLS、Routing。</p>
+        </div>
+        <div class="diff-item">
+          <div class="tag">11.3</div>
+          <h4>SSL 自动化</h4>
+          <p>Tenant 不应该自己购买、上传和更新证书。由平台统一负责 Domain Validation → TLS Certificate → Deployment → Renewal，实现真正 SaaS 化。</p>
+        </div>
+        <div class="diff-item">
+          <div class="tag">11.4</div>
+          <h4>White Label 完整性</h4>
+          <p>不能只做到换 Logo，而要覆盖 Login、Dashboard、Browser Title、Favicon、Email、Quote、PI、PDF、Error Page，防止在某些页面出现平台开发商品牌。</p>
+        </div>
+        <div class="diff-item">
+          <div class="tag">11.5</div>
+          <h4>Lemon Squeezy Webhook</h4>
+          <p>Webhook 可能存在重复、延迟、乱序、网络失败。因此系统需要 Webhook Signature Verification + Webhook Log + Idempotency + Retry + Async Processing，防止 Tenant 重复创建、Subscription 重复处理、状态异常。</p>
+        </div>
+        <div class="diff-item">
+          <div class="tag">11.6</div>
+          <h4>文件权限</h4>
+          <p>文件系统必须同时处理 Tenant Permission + Client Permission。例如 Tenant A Client A 只能访问 Tenant A + Client A Files，不能通过文件 ID 访问其他文件。</p>
+        </div>
+      </section>
+
+      <section class="doc" id="s12">
+        <div class="sec-head"><span class="idx">12</span><h2>安全设计</h2></div>
+        <p>V1 将重点覆盖：</p>
+        <div class="chips">
+          <span class="chip">Password Hash</span>
+          <span class="chip">Secure Cookie</span>
+          <span class="chip">JWT / Session</span>
+          <span class="chip">Rate Limit</span>
+          <span class="chip">Input Validation</span>
+          <span class="chip">Tenant Isolation</span>
+          <span class="chip">Role Authorization</span>
+          <span class="chip">File Permission</span>
+          <span class="chip">Webhook Signature</span>
+          <span class="chip">Audit Log</span>
+          <span class="chip">Secure Header</span>
+          <span class="chip">SQL Injection Protection</span>
+          <span class="chip">IDOR Protection</span>
+        </div>
+      </section>
+
+      <section class="doc" id="s13">
+        <div class="sec-head"><span class="idx">13</span><h2>Audit Log</h2></div>
+        <p>系统记录关键行为，用于安全、排查、审计和客户支持。例如：</p>
+        <div class="chips">
+          <span class="chip">Login</span>
+          <span class="chip">Invite User</span>
+          <span class="chip">Upload File</span>
+          <span class="chip">Delete File</span>
+          <span class="chip">Create Ticket</span>
+          <span class="chip">Update Ticket</span>
+          <span class="chip">Create Quote</span>
+          <span class="chip">Create PI</span>
+          <span class="chip">Add Domain</span>
+          <span class="chip">Verify Domain</span>
+          <span class="chip">Subscription Suspended</span>
+        </div>
+      </section>
+
+      <section class="doc" id="s14">
+        <div class="sec-head"><span class="idx">14</span><h2>V1 页面范围</h2></div>
+        <div class="page-cols">
+          <div class="card">
+            <h4>Platform Admin</h4>
+            <ul>
+              <li>Login</li>
+              <li>Dashboard</li>
+              <li>Tenants</li>
+              <li>Tenant Detail</li>
+              <li>Subscriptions</li>
+              <li>Domains</li>
+              <li>Webhooks</li>
+              <li>Logs</li>
+              <li>Settings</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Tenant Admin</h4>
+            <ul>
+              <li>Login / Dashboard</li>
+              <li>Clients / Client Detail</li>
+              <li>Files</li>
+              <li>Tickets / Ticket Detail</li>
+              <li>Quotes / Quote Editor</li>
+              <li>PI / PI Editor</li>
+              <li>Team</li>
+              <li>Branding</li>
+              <li>Custom Domain</li>
+              <li>Billing</li>
+              <li>Profile</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Client</h4>
+            <ul>
+              <li>Login</li>
+              <li>Dashboard</li>
+              <li>Files</li>
+              <li>Tickets</li>
+              <li>Ticket Detail</li>
+              <li>Quotes</li>
+              <li>PI</li>
+              <li>Profile</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="doc" id="s15">
+        <div class="sec-head"><span class="idx">15</span><h2>V1 不包含范围</h2></div>
+        <p>为保证项目周期和预算，本阶段明确不包含：</p>
+        <div class="chips">
+          <span class="chip out">CRM</span>
+          <span class="chip out">Sales Pipeline</span>
+          <span class="chip out">Marketing Automation</span>
+          <span class="chip out">Appointment</span>
+          <span class="chip out">Calendar</span>
+          <span class="chip out">SMS</span>
+          <span class="chip out">AI</span>
+          <span class="chip out">Native APP</span>
+          <span class="chip out">Online Chat</span>
+          <span class="chip out">Accounting</span>
+          <span class="chip out">Electronic Signature</span>
+          <span class="chip out">Workflow Builder</span>
+          <span class="chip out">File Online Editor</span>
+          <span class="chip out">Google Drive Integration</span>
+          <span class="chip out">Dropbox Integration</span>
+          <span class="chip out">Custom Permission Builder</span>
+          <span class="chip out">Custom Email Sending Domain</span>
+          <span class="chip out">多语言</span>
+          <span class="chip out">Online Invoice Payment</span>
+          <span class="chip out">Recurring Invoice</span>
+          <span class="chip out">Knowledge Base</span>
+          <span class="chip out">Advanced BI</span>
+        </div>
+        <p>以上内容如后续需要，可作为 Phase 2 独立扩展。</p>
+      </section>
+
+      <section class="doc" id="s16">
+        <div class="sec-head"><span class="idx">16</span><h2>第三方费用</h2></div>
+        <p>以下费用不包含在开发报价内，由客户实际使用账户支付：</p>
+        <div class="chips">
+          <span class="chip">AWS</span>
+          <span class="chip">Domain</span>
+          <span class="chip">Lemon Squeezy Transaction Fee</span>
+          <span class="chip">Email Sending</span>
+          <span class="chip">DNS</span>
+          <span class="chip">其他第三方服务</span>
+        </div>
+        <div class="quote warn">初期轻量使用情况下，AWS 可以采用成本较低的基础配置。后续随客户量增长再扩容。</div>
+      </section>
+
+      <div class="footer">
+        轻量化多租户白标客户门户 SaaS · 项目建设及报价方案<br />
+        本文档仅供方案评审与商务沟通使用
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const links = [...document.querySelectorAll('#toc a')];
+    const sections = links
+      .map((a) => document.querySelector(a.getAttribute('href')))
+      .filter(Boolean);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = '#' + entry.target.id;
+          links.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === id));
+        });
+      },
+      { rootMargin: '-18% 0px -70% 0px', threshold: 0 }
+    );
+    sections.forEach((s) => io.observe(s));
+  })();
+</script>
+</body>
+</html>
